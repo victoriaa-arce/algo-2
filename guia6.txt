@@ -1,0 +1,238 @@
+Ejercicio 1 
+Sin Repetidos 
+Modulo ConjAcotadoArr<T> implementa ConjAcotado<T> {
+    var datos: Array<T>;
+    var largo: int;
+    InvRep (c': ConjAcotadoArr<T>){
+        0 <= c'.largo < c'.datos.length && for all i, j: int :: 0 <= i, j < c'.datos.length &&L i != j  ==> c'.datos[i] != c'.datos[j]
+    }
+    FuncAbs(c': ConjAcotadoArr<T>){
+        c: ConjAcotado |
+        c'.largo == |c.elems| && for all i: int :: 0 <= i < |c.elems| ==>L c'.datos[i] == c.elems[i]
+    }
+    proc agregar (inout c: ConjAcotadoArr<T>, elem : T){
+        requiere: { c.datos.length < c.largo}
+        requiere: { ! elem in c. datos}
+        asegura : {c.largo = old(c).largo + 1}
+        asegura : { elem in c.datos}
+        {
+            var i : int; 
+            var agrandar: array<T>;
+            agrandar = new Array<T> 
+            i : 0;
+            
+            while (c.datos[i] != elem && i < c.datos.length){
+                i : i + 1;
+            }
+            if (i == c.largo ){
+                c.datos[i] := elem;
+                c.largo = c.largo + 1;
+                } else {
+                    skip
+                } endif 
+            
+                                                                                       
+        }
+    }
+}
+Modulo ConjAcotadoArr<T> implementa ConjAcotado<T> {
+    var datos: Array<T>;
+    var largo: int;
+
+    InvRep (c': ConjAcotadoArr<T>){
+        0 <= c'.largo < c'.datos.length 
+    }
+
+    FuncAbs(c': ConjAcotadoArr<T>){
+        c: ConjAcotado |
+        c'.largo == |c.elems| && for all i: int :: 0 <= i < |c.elems| ==>L c'.datos[i] == c.elems[i]
+    }
+    proc agregar (inout c: ConjAcotadoArr<T>, elem : T){
+        requiere: { c.datos.length < c.largo}
+        asegura : { c.largo ==  
+                        if elem in c.datos then 
+                            old(c).largo 
+                        else 
+                            old(c).largo + 1
+                }
+        asegura : { elem in c.datos}
+    {
+        if (c.largo < c.datos.length){
+            c.datos[c.largo] = elem;
+            c.largo = c.largo + 1;
+
+        }else {
+        var i : int
+        var j : int
+        var aux: int
+        aux := -1
+        i := 0
+        while i < c.largo {
+            j := 0
+            while j < c.largo {
+                if i != j && c.datos[i] = c.datos[j] then
+                    aux := j
+                else
+                    skip
+                endif
+                j := j + 1
+            }
+            i := i + 1
+        }
+        c.datos[aux] := e
+            }
+
+    }
+    }
+
+}
+
+Ejercicio 2  Pilasincapacidad
+Modulo PilaImpl implementa PilaNoAcotada{
+    var pila : Array <T>;
+    var size : int;
+
+    InvRep (p: PilaImpl){
+        0 <= p.size < p.pila.length
+    }
+    FuncAbs (p': PilaImpl){
+        p: Pila |
+        p'.size == |p.s| && for all i: int :: 0 <= i < |p.s| ==>L p.pila[i] == p.s[i]
+    }
+    proc apilar(inout p: PilaImpl, e: T){
+        requiere : {InvRep(p)}
+        asegura : {p.pila = concat(old(p).pila, <e>)}
+        asegura : {p.size = old(p).size + 1}
+        asegura : {FuncAbs(p)}
+        asegura :{InvRep(p)} // consultar por los asegura y requiere de inv rep y FuncAbs
+        {
+            if (p.size < p.pila.length){
+                p.pila[p.size] := e;
+            } else {
+                var array: Array<T> # creo una variable para copiar los datos de pila PERO TODAVIA DEBO INICIALIZARLA
+                var int i; 
+                array := new Array<T>(p.size*2); # aca inicializo la variable
+                i := 0;
+                while (i < p.largo){
+                    array[i] := p.pila[i];
+                    i +=1; 
+                }
+                array[i] := e ;
+                p.pila := array;
+
+            }
+            endif
+            p.largo = p.largo + 1;
+        }
+    }
+    proc desapilar(inout p: PilaImpl): {
+        requiere : {InvRep(p)}
+        asegura : {p.size = old(p).size - 1}
+        asegura :{p.pila = subseq(old(p).pila, 0, p.size - 1)}
+        {
+            p.largo = p.largo - 1;
+            return p.pila[p.largo];
+        }
+    }
+}
+// asumo que pilaEli es el mismo TAD que PIla solo que se agrega el proc eliminar
+Modulo PilaElimImpl implementa PilaEli {
+    var datos: Array <T>;
+    var enUso : Array<bool>
+    var long : int 
+    InvRep (p: PilaElimImpl) {
+        0 <= p.long < p.datos.length && p.long == contador(p.enUso) && p.datos.length == p.enUso.length 
+    }
+    aux contador (array: Array<bool>){
+        sum i : int :: 0 <= i < array.length :: if array[i] == true then 1 else 0 fi  
+    }
+    FuncAbs (p': PilaElimImpl){
+        p: PilaEli |
+        |p.s| == p'.largo && |p.s| == contador(p'.enUso) && for all i: int :: 0 <= i < p'.largo :: exists j :int :: 0 <= j < p'.largo ==>L p.s[i] == p'.pila[j]
+    }
+    proc desapilar(inout p: PilaElimImpl): T {
+        requiere : {InvRep(p)}
+        asegura : {p.pila = subseq(old(p).pila, 0 , old(p).pila.length - 2)}
+        asegura : {p.long = old(p).long - 1 } 
+        {
+            
+        }
+    }
+}
+
+Ejercicio 4
+Buffer 
+Modulo BufferCircular implementa Cola {
+    var datos : Array <T>
+    var inicio : int
+    var fin : int 
+    
+    InvRep(b: BufferCircular){
+        0 <= b.inicio, b.fin < b.datos.length && b.inicio != b.fin
+    }
+    
+    FuncAbs (b :  BufferCircular): ColaAcotada<T> {
+        c: Cola |
+        |c.s| == b.datos.length && c.s[0] == b.datos[fin] && c.s[|c.s| - 1] == b.datos[inicio]
+    }
+
+    proc desencolar (inout b : BufferCircular) : T {
+        requiere {c = C_0}
+
+        requiere {|FunAbs(c).s| > 0}
+
+        requiere {InvRep(c)}
+
+        asegura {InvRep(c)}
+
+        asegura {FunAbs(c).s = subseq(FunAbs(C_0).s,1,|FunAbs(C_0).s|)}
+
+        asegura {res = C_0.datos[C_0.fin]}
+    }
+}
+
+
+Modulo Indice implementa ArrayConTuplas<T> {
+    var datos: Array<intxint>
+    var ind1 : Array<int>
+    var ind2 : Array<int>
+    pred InvRep (i: Indice){
+        i.datos.length == i.ind1.length && i.ind1 == i.ind2.length && 
+    }
+    pred contieneElementos(a1: Array<intxint>, a2: Array<int>, a3:Array<int>){
+        for all i: int :: 0 <= i < a1.length ==>L a1[i] == [a2] 
+    }
+}
+
+
+
+Ejercicio 6
+a) En el invariante de representacion deberia incluir que cada clave que está en totalPorProducto está en ultimoPrecio y viceversa. A su vez, debo afirmar que el valor asociado a cada
+ clave de ¿l diccionario total por producto es la suma de los todos los montos de ese producto en ventas. Necesito aclarar que todos los montos son positivos y que las fechas tambien lo son 
+
+
+ InvRep(c: ComercioImpl){
+    mismasClaves(c.totalPorProducto, c.ultimoPrecio) && mismasClaves(c.ultimoPrecio, c.totalPorProducto) && esSuma(c.ventas, c.totalPorProducto) && fechasPositivas(c.ventas)
+ && esUltimaVenta(c.ventas, c.ultimoPrecio) }
+ pred mismasClaves(d1:DiccionarioImpl, d2: DicccionarioImpl){
+    for all p: Producto :: p in d1 ==>L p in d2
+ }
+ pred esSuma(s: SecImpl<tupla<Producto, Fecha, Monto>>, d1: DicccionarioImpl<Producto, Monto){
+    for all p : Producto :: p in d1 ==>L d1[p] == suma(s, p)
+ }
+aux suma (s: SecImpl<tupla<Producto, Fecha, Monto>>, p : Producto) == sum i :int :: 0 <= i < s.length :: if s[i][0] == p then s[i][2] else 0 fi 
+
+pred fechasPositivas (s: SecImpl<tupla<Producto, Fecha, Monto>>){
+    for all i: int :: 0 <= i < s.length ==>L s[i][1] >= 0 
+}
+pred fechasDistintas (s: SecImpl<tupla<Producto, Fecha, Monto>>){
+    for all i, j: int :: ( 0 <= i, j < s.length && i != j )==>L s[i][1] != s[j][1]
+}
+Ejercicio 7 
+a) En el invariante de representacion del modulo planta deberia mencionar que todas las claves de tipo alarma en el diccionario alarmas deben aparecer dentro dl
+ conjunto de alarmas de los sensores que aparecen como valor en el diccionario alarmas y viceversa.
+
+pred estanTodaslasClaves (d1: DiccionarioImpl<Alarma, Conjunto<Sensores>>, d2: DiccionarioImpl<Sensores, Conjunto<Alarmas>>){
+    (for all a: Alarma :: a in d1 ==>L for all s: Sensores :: s in d1[a] ==>L s in d2 ) && (for all s: Sensores :: s in d2 ==>L for all a: Alarmas :: a in d2[s] ==>L a in d1)
+}
+
